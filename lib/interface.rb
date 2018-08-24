@@ -1,17 +1,27 @@
-
-
+#################################
+########## BEGIN INTRO ##########
+#################################
 def welcome_message
   puts "__________________________________"
   puts "WELCOME TO YAN-FOR SALES DATABASE"
   puts "__________________________________"
 end
 
+# accepts and returns an number in string-form from the user
 def gets_user_input_index
   puts "Please select the option number (example: 1)"
   input = gets.chomp
 end
 
+###############################
+########## END INTRO ##########
+###############################
 
+#######################################
+########## BEGIN DIRECTORIES ##########
+#######################################
+
+# primary directory
 def directory
   puts "1. Global Data"
   puts "2. Local Data"
@@ -21,6 +31,7 @@ def directory
   puts "6. Exit"
 end
 
+# lists all 'local' stores
 def local_store_listings
   puts "Enter Country from List into Console. Please enter number:"
   Store.pluck(:location).each_with_index do |country,index|
@@ -28,6 +39,15 @@ def local_store_listings
       end
 end
 
+# lists all products with price - Ref. No. gives the user a number to enter in
+# order to select that item
+def all_products
+  Product.all.each do |product|
+      puts "#{product.name}, Current Price: #{product.price}, Ref. No. #{product.id}"
+      end
+end
+
+# Lists all possible actions for a 'local' store instance
 def local_store_info
   puts "1. Store Revenue"
   puts "2. Products"
@@ -38,52 +58,7 @@ def local_store_info
   puts "7. Exit"
 end
 
-def local_navigator(store)
-  local_store_info
-  info_selection = gets_user_input_index
-
-  case info_selection
-  when '1'
-    puts store.revenue
-    puts "======================"
-  when '2'
-    puts store.products.pluck(:name)
-    puts "======================"
-  when '3'
-    puts store.customers.distinct.pluck(:name)
-    puts "======================"
-  when '4'
-    puts store.local_customer_emails
-    puts "======================"
-  when '5'
-    puts store.most_valued_customers
-    puts "======================"
-  when '6'
-    load 'bin/run.rb'
-    puts "======================"
-  when '7'
-    abort
-  end
-
-  puts "Return to list? (y/n)"
-  response = gets.chomp
-  if response == 'y'
-    local_navigator(store)
-  else
-    load 'bin/run.rb'
-  end
-
-end
-
-
-def local_store_search(input_location)
-  return_value = Store.find(input_location.to_i)
-  if return_value == nil
-    puts "Invalid Entry."
-  end
-  return_value
-end
-
+# Lists all possible actions for the Store class
 def global_directory
   puts "1. Total Revenue All Stores"
   puts "2. Transaction Volume by Card Type"
@@ -98,6 +73,45 @@ def global_directory
   puts "11. Exit"
 end
 
+#####################################
+########## END DIRECTORIES ##########
+#####################################
+
+
+######################################
+########## BEGIN NAVIGATORS ##########
+######################################
+
+# primary navigator - directs the flow of actions based on user input
+def navigator(input)
+  case input
+  when '1'
+    # direct to global data
+    # global_directory
+    # input = gets_user_input_index
+    global_navigator
+  when '2'
+    # direct to local data
+    local_store_listings
+    input_location = gets.chomp
+    store_instance = local_store_search(input_location)
+    local_navigator(store_instance)
+  when '3'
+    create_product
+    load 'bin/run.rb'
+  when '4'
+    update_product
+    load 'bin/run.rb'
+  when '5'
+    create_order
+    load 'bin/run.rb'
+  when '6'
+    abort
+  end
+
+end
+
+# sub navigator - directs flow of actions on the global page based on user input
 def global_navigator
   global_directory
   input = gets_user_input_index
@@ -145,35 +159,75 @@ def global_navigator
   end
 end
 
-def navigator(input)
-  case input
+# sub navigator - directs flow of actions on the local page based on user input
+def local_navigator(store)
+  local_store_info
+  info_selection = gets_user_input_index
+
+  case info_selection
   when '1'
-    # direct to global data
-    # global_directory
-    # input = gets_user_input_index
-    global_navigator
+    puts store.revenue
+    puts "======================"
   when '2'
-    # direct to local data
-    local_store_listings
-    input_location = gets.chomp
-    store_instance = local_store_search(input_location)
-    local_navigator(store_instance)
+    puts store.products.pluck(:name)
+    puts "======================"
   when '3'
-    create_product
-    load 'bin/run.rb'
+    puts store.customers.distinct.pluck(:name)
+    puts "======================"
   when '4'
-    update_product
-    load 'bin/run.rb'
+    puts store.local_customer_emails
+    puts "======================"
   when '5'
-    create_order
-    load 'bin/run.rb'
+    puts store.most_valued_customers
+    puts "======================"
   when '6'
+    load 'bin/run.rb'
+    puts "======================"
+  when '7'
     abort
+  end
+
+  puts "Return to list? (y/n)"
+  response = gets.chomp
+  if response == 'y'
+    local_navigator(store)
+  else
+    load 'bin/run.rb'
   end
 
 end
 
-def create_product #store method
+####################################
+########## END NAVIGATORS ##########
+####################################
+
+####################################
+########## BEGIN SEARCHES ##########
+####################################
+
+# pulls up the store instance that our methods will operate on when called
+# inside of the local store page
+def local_store_search(input_location)
+  return_value = Store.find(input_location.to_i)
+  if return_value == nil
+    puts "Invalid Entry."
+  end
+  return_value
+end
+
+##################################
+########## END SEARCHES ##########
+##################################
+
+
+###########################################
+########## BEGIN CRUD OPERATIONS ##########
+###########################################
+
+# prompts a user to manually enter attributes for each product; creates the
+# product; iterates through each store and adds it to inventory by creating
+# a StoreProduct instance for each store
+def create_product
   puts "Enter a name for the product:"
     name = gets.chomp
   puts "Enter a category for the product:"
@@ -195,13 +249,8 @@ def create_product #store method
   puts "#{new_product.name} - #{new_product.category} - #{new_product.price} - #{new_product.in_season}"
 end
 
-
-def all_products
-  Product.all.each do |product|
-      puts "#{product.name}, Current Price: #{product.price}, Ref. No. #{product.id}"
-      end
-end
-
+# prompts the user if they want to update either the price or its availability
+# based upon its 'in_season' status
 def update_product
   all_products
   puts "Enter Product from List into Console. Please use reference number:"
@@ -225,6 +274,9 @@ def update_product
 
 end
 
+# allows an employee to manually enter a new order with a product and customer
+# if a customer doesn't exist in AR, it will create a new entry and prompt for
+# a name; ideally, the bulk of order entries would be seeded with a CSV importer
 def create_order
   puts "_______________________________________________"
   puts "Welcome to the Yan-For Manual Order Entry Form"
@@ -256,3 +308,7 @@ def create_order
   puts "Order Submitted."
 
 end
+
+#########################################
+########## END CRUD OPERATIONS ##########
+#########################################

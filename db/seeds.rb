@@ -37,7 +37,7 @@ puts "Beginning seed."
 
 
 # 50.times do
-#   Purchase.create(customer_id: rand(1..Customer.last.id), product_id: rand(1..Product.last.id))
+#   Purchase.create(customer_id: rand(1..Custoqmer.last.id), product_id: rand(1..Product.last.id))
 # end
 
 
@@ -50,10 +50,10 @@ puts "Beginning seed."
 #     StoreProduct.create(store_id: store.id, product_id: product.id)
 #   end
 # end
-# StoreProduct.create(store_id: 1, product_id: 2)
-# StoreProduct.create(store_id: 2, product_id: 1)
-# StoreProduct.create(store_id: 3, product_id: 3)
-# StoreProduct.create(store_id: 1, product_id: 3)
-# StoreProduct.create(store_id: 2, product_id: 3)
+StoreProduct.create(store_id: 1, product_id: 2)
+StoreProduct.create(store_id: 2, product_id: 1)
+StoreProduct.create(store_id: 3, product_id: 3)
+StoreProduct.create(store_id: 1, product_id: 3)
+StoreProduct.create(store_id: 2, product_id: 3)
 
 puts "Seed complete."
